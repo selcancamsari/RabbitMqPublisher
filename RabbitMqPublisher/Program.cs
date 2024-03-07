@@ -39,18 +39,35 @@ using IModel channel = connection.CreateModel();
 
 #region DirectExchange
 
-channel.ExchangeDeclare(exchange: "direct-exchange-example", type: ExchangeType.Direct);
+//channel.ExchangeDeclare(exchange: "direct-exchange-example", type: ExchangeType.Direct);
 
-while (true)
+//while (true)
+//{
+//    Console.Write("Mesaj : ");
+//    string message = Console.ReadLine();
+//    byte[] byteMessage = Encoding.UTF8.GetBytes(message);
+
+//    channel.BasicPublish(exchange: "direct-exchange-example",
+//                         routingKey:"direct-queue-example",
+//                         body: byteMessage
+//        );
+//}
+
+#endregion
+
+#region FanoutExchange
+
+channel.ExchangeDeclare(exchange: "fanout-exchange-example", type: ExchangeType.Fanout);
+
+for (int i = 0; i < 50; i++)
 {
-    Console.Write("Mesaj : ");
-    string message = Console.ReadLine();
-    byte[] byteMessage = Encoding.UTF8.GetBytes(message);
+    await Task.Delay(200);
 
-    channel.BasicPublish(exchange: "direct-exchange-example",
-                         routingKey:"direct-queue-example",
-                         body: byteMessage
-        );
+    byte[] message = Encoding.UTF8.GetBytes($"Merhaba {i} " );
+    channel.BasicPublish(
+        exchange: "fanout-exchange-example",
+        routingKey: string.Empty,
+        body: message);
 }
 
 #endregion
