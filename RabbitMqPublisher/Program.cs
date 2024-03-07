@@ -14,7 +14,8 @@ using IModel channel = connection.CreateModel();
 //durable parametresi mesajların kuyrukta ne kadar kalacağını belirtir.
 //exclusive parametresi kuyruğun özel olup olmadığı. Birden fazla kuyruk ile özel olarak işlem yapıp yapamayacağımızı belirtir.
 //autoDelete tüm mesajların tüketildiğinde kuyruğun silinip silinemeyeceğine dair yapılanmadır.
-channel.QueueDeclare(queue: "example-queue", exclusive:false);
+//durable: true kuyruğun kalıcılığı için konfigürasyon (message durability)
+channel.QueueDeclare(queue: "example-queue", exclusive: false, durable: true);
 
 //Queue'ya Mesaj Gönderme
 ////Kuyruğa atılan mesajlar byte türünden olmalı. RabbitMq
@@ -23,11 +24,15 @@ channel.QueueDeclare(queue: "example-queue", exclusive:false);
 ////exchange boş bırakırsak default exhange olur. yani direct exchange
 //channel.BasicPublish(exchange:"", routingKey:"example-queue",body: message);
 
+//mesajın kalıcılığı için (message durability)
+IBasicProperties properties = channel.CreateBasicProperties();
+properties.Persistent = true;
+
 for (int i = 0; i < 10; i++)
 {
-    await Task .Delay(200);
+    await Task.Delay(200);
     byte[] message = Encoding.UTF8.GetBytes("Merhaba " + i);
-    channel.BasicPublish(exchange: "", routingKey: "example-queue", body: message);
+    channel.BasicPublish(exchange: "", routingKey: "example-queue", body: message, basicProperties: properties);
 }
 
 Console.Read();
