@@ -57,19 +57,41 @@ using IModel channel = connection.CreateModel();
 
 #region FanoutExchange
 
-channel.ExchangeDeclare(exchange: "fanout-exchange-example", type: ExchangeType.Fanout);
+//channel.ExchangeDeclare(exchange: "fanout-exchange-example", type: ExchangeType.Fanout);
 
-for (int i = 0; i < 50; i++)
+//for (int i = 0; i < 50; i++)
+//{
+//    await Task.Delay(200);
+
+//    byte[] message = Encoding.UTF8.GetBytes($"Merhaba {i} " );
+//    channel.BasicPublish(
+//        exchange: "fanout-exchange-example",
+//        routingKey: string.Empty,
+//        body: message);
+//}
+
+#endregion
+
+#region TopicExchange
+
+channel.ExchangeDeclare(
+    exchange: "topic-exchange-example",
+    type: ExchangeType.Topic
+    );
+
+for (int i = 0; i < 100; i++)
 {
     await Task.Delay(200);
+    byte[] message = Encoding.UTF8.GetBytes($"Merhaba {i} ");
+    Console.WriteLine("Mesajın Gönderileceği Topic Formatını Giriniz " );
+    string topic = Console.ReadLine();
 
-    byte[] message = Encoding.UTF8.GetBytes($"Merhaba {i} " );
     channel.BasicPublish(
-        exchange: "fanout-exchange-example",
-        routingKey: string.Empty,
-        body: message);
+        exchange: "topic-exchange-example",
+        routingKey: topic,
+        body: message
+        );
 }
-
 #endregion
 
 Console.Read();
