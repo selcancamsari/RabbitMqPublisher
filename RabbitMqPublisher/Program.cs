@@ -74,24 +74,54 @@ using IModel channel = connection.CreateModel();
 
 #region TopicExchange
 
+//channel.ExchangeDeclare(
+//    exchange: "topic-exchange-example",
+//    type: ExchangeType.Topic
+//    );
+
+//for (int i = 0; i < 100; i++)
+//{
+//    await Task.Delay(200);
+//    byte[] message = Encoding.UTF8.GetBytes($"Merhaba {i} ");
+//    Console.WriteLine("Mesajın Gönderileceği Topic Formatını Giriniz " );
+//    string topic = Console.ReadLine();
+
+//    channel.BasicPublish(
+//        exchange: "topic-exchange-example",
+//        routingKey: topic,
+//        body: message
+//        );
+//}
+#endregion
+
+#region HeaderExchange
+
+
 channel.ExchangeDeclare(
-    exchange: "topic-exchange-example",
-    type: ExchangeType.Topic
+    exchange: "header-exchange-example",
+    type: ExchangeType.Headers
     );
 
 for (int i = 0; i < 100; i++)
 {
     await Task.Delay(200);
     byte[] message = Encoding.UTF8.GetBytes($"Merhaba {i} ");
-    Console.WriteLine("Mesajın Gönderileceği Topic Formatını Giriniz " );
-    string topic = Console.ReadLine();
+    Console.WriteLine("Header Value Değerini Giriniz.");
+    string value = Console.ReadLine();
+
+    IBasicProperties basicProperties = channel.CreateBasicProperties();
+    basicProperties.Headers = new Dictionary<string, object>
+    {
+        ["no"] = value
+    };
 
     channel.BasicPublish(
-        exchange: "topic-exchange-example",
-        routingKey: topic,
-        body: message
+        exchange: "header-exchange-example",
+        routingKey: string.Empty,
+        body: message,
+        basicProperties: basicProperties
         );
 }
-#endregion
+#endregion 
 
 Console.Read();
